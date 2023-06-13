@@ -1,0 +1,24 @@
+body{
+    background-color: rgb(255, 255, 255);
+}
+.slidecontainer {
+    width: 1000%; /* Width of the outside container */
+}
+#gui_css 
+{    
+    position: absolute;
+  
+    left: 50%;
+    top: 50%;
+
+    width: 400px;
+    height: 200px;
+}
+/*
+p{
+    color:rgb(32, 222, 28)
+}
+h{g
+    color:rgb(146, 25, 86)
+}
+*/
