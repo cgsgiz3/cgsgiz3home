@@ -1,10 +1,10 @@
 const http = require("http");
 const express = require("express");
-const morgan = require("morgan");
+const morgan = require("morgan");  //логгирование 
 const WebSocket = require("ws");
 
 const app = express();
-app.use(morgan("combined"));
+app.use(morgan("combined"));  // используем еще один мидлвэр   ... то что мы будем логгировать ....     логгировать в файл
 app.use(express.static("."));
 
 const server = http.createServer(app);
