@@ -8,32 +8,38 @@
     text-align: left;
 }
 .chat {
-    width:1000px; /* ширина нашего блока */
-    height:200px; /* высота нашего блока */
+    width:1030px; /* ширина нашего блока */
+    height:400px; /* высота нашего блока */
     background: #ffffff; /* цвет фона, белый */
-    border: 1px solid #dd1313; /* размер и цвет границы блока */
+    border: 5px groove #ce0909; /* размер и цвет границы блока */
     overflow-y: auto; /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
     overflow-x: hidden; /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
     margin: auto;
 }
 .clientinput {
     resize: none;
-    height: 200px;
-    width: 200px;
-    margin: auto;
     overflow-x: hidden;
     overflow-y: auto;
 }
-.clientoutput {
-    height:auto; /* высота нашего блока */
-    background: #b3f1a4; /* цвет фона, белый */
+.clientoutput {         
+    height: auto;                  
+     /* ширина нашего блока */
+    background: #4ee707; /* цвет фона, белый */
+    border: 5px groove #41ce09; /* размер и цвет границы блока */
     overflow: hidden; /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
+    margin: auto;
     position: relative;
-    left: 500px;
+    left: 245px;
+    word-wrap: break-word;
 }
 .serveroutput {
-    width: 500px;
-    height:auto; /* высота нашего блока */
-    background: #f1a4a4; /* цвет фона, белый */
+    height: auto;                  
+    width:500px; /* ширина нашего блока */
+    background: #e70707cc; /* цвет фона, белый */
+    border: 5px groove #ce0909; /* размер и цвет границы блока */
     overflow: hidden; /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
+    margin: auto;
+    position: relative;
+    right: 265px;
+    word-wrap: break-word;
 }

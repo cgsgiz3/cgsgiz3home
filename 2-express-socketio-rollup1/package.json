@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build-goodclient": "rollup -c rollup.configgoodclient.js --watch",
-    "build-badclient": "rollup -c rollup.configbadclient.js --watch",
+    "build-client": "rollup -c --watch",
     "start-server": "cd dist && node ../server/server.js"
   },
   "author": "",
