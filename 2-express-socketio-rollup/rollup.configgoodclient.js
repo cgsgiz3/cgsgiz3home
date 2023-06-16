@@ -2,7 +2,7 @@ const resolve = require("@rollup/plugin-node-resolve"); // иметь возмо
 const commonjs = require("@rollup/plugin-commonjs"); // иметь возможность работать с модулями любого типа
 
 module.exports = {
-  input: "client/client.js",
+  input: "client/goodclient.js",
   output: {
     file: "dist/chat/bundle.js",
     format: "iife",
