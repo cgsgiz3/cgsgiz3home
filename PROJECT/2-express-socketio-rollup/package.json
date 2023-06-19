@@ -1,0 +1,28 @@
+{
+  "name": "http_server_2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build-goodclient": "rollup -c rollup.configgoodclient.js --watch",
+    "build-badclient": "rollup -c badclient.js --watch",
+    "start-server": "cd dist && node ../server/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.1",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "morgan": "^1.10.0",
+    "rollup": "^3.25.1",
+    "rollup-plugin-glslify": "^1.3.1",
+    "socket.io": "^4.6.2",
+    "socket.io-client": "^4.6.2",
+    "ws": "^8.13.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "rollup-plugin-string": "^3.0.0"
+  }
+}
