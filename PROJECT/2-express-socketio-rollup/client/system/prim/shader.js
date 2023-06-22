@@ -1,6 +1,9 @@
 /* eslint-disable no-undef */
-import frag from "./shaders/frag.glsl"
-import vert from "./shaders/vert.glsl"
+import cowfrag from "./shaders/cow/frag.glsl";
+import cowvert from "./shaders/cow/vert.glsl";
+import gridfrag from "./shaders/grid/frag.glsl";
+import gridvert from "./shaders/grid/vert.glsl";
+
 function loadshader(type, source) {
   const shader = gl.createShader(type);
 
@@ -12,7 +15,15 @@ function loadshader(type, source) {
   }
   return shader;
 }
-export function createshader() {
+export function createshader(name) {
+  let frag, vert;
+  if (name === "cow") {
+    frag = cowfrag;
+    vert = cowvert;
+  } else if (name === "grid") {
+    frag = gridfrag;
+    vert = gridvert;
+  }
   const vertexShader = loadshader(gl.VERTEX_SHADER, vert);
   const fragmentShader = loadshader(gl.FRAGMENT_SHADER, frag);
   const shaderProgram = gl.createProgram();
@@ -28,10 +39,7 @@ export function createshader() {
   let shaderatr = {};
   shaderatr.attrs = {};
   shaderatr.uniformBlocks = {};
-  let countAttr = gl.getProgramParameter(
-    shaderProgram,
-    gl.ACTIVE_ATTRIBUTES
-  );
+  let countAttr = gl.getProgramParameter(shaderProgram, gl.ACTIVE_ATTRIBUTES);
   for (let i = 0; i < countAttr; i++) {
     const info = gl.getActiveAttrib(shaderProgram, i);
     shaderatr.attrs[info.name] = {

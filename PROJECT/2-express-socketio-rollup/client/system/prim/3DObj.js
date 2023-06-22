@@ -1,8 +1,8 @@
 //import {motobike} from "./models/motobike.js"
-import {cow} from "./models/cow.js"
-export function objLoadSync() 
-{
+import { cow } from "./models/cow.js";
+export function objLoadSync() {
   let primitive = {};
+  primitive.file = "cow";
   primitive.type = "trimesh";
   primitive.buffer = {};
   primitive.uniform = {
@@ -18,10 +18,11 @@ export function objLoadSync()
     },
   };
   let text = cow.split("\n");
-  let nv = 0, nf = 0;
-  let I = [], V = [];
-  for (let i = 0; i < text.length; i++) 
-  {
+  let nv = 0,
+    nf = 0;
+  let I = [],
+    V = [];
+  for (let i = 0; i < text.length; i++) {
     let massiv = text[i].split(" ");
     if (massiv[0] === "v") {
       for (let j = 1; j < massiv.length; j++) {

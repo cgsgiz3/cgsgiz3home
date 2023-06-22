@@ -1,10 +1,7 @@
-export function camera()
-{
+export function camera() {
   let first = true;
-  this.responsemouse = function(event)
-  {
-    if (first)
-    {
+  this.responsemouse = function (event) {
+    if (first) {
       this.mx = event.clientX;
       this.my = event.clientY;
     }
@@ -13,7 +10,7 @@ export function camera()
     this.mx = event.clientX;
     this.my = event.clientY;
   };
-  this.responsemousewheel = function(event) {
+  this.responsemousewheel = function (event) {
     if (event.deltaY > 0.0) {
       this.mdz = 0.5;
     } else {
@@ -21,8 +18,7 @@ export function camera()
     }
     this.mz += this.mdz;
   };
-  this.responsemouseup = function(event)
-  {
+  this.responsemouseup = function (event) {
     let type;
     if (event.which === 1 && event.button === 0) {
       type = "lmouse";
@@ -33,8 +29,7 @@ export function camera()
     }
     this.keyboard[type] = 0;
   };
-  this.responsemousedown = function(event)
-  {
+  this.responsemousedown = function (event) {
     let type;
     if (event.which === 1 && event.button === 0) {
       type = "lmouse";
@@ -45,20 +40,16 @@ export function camera()
     }
     this.keyboard[type] = 1;
   };
-  this.keys = function(key) 
-  {
+  this.keys = function (key) {
     return !!this.keyboard[key];
   };
-  this.responsekeyup = function(event) {
+  this.responsekeyup = function (event) {
     this.keyboard[event.code] = 0;
-
-  }
-  this.responsekeydown = function(event)
-  {
+  };
+  this.responsekeydown = function (event) {
     this.keyboard[event.code] = 1;
   };
-  this.responsecamera = function()
-  {
+  this.responsecamera = function () {
     let Dist = sys.subVec(this.at, this.loc).length(),
       cosT = (this.loc.y - this.at.y) / Dist,
       sinT = Math.sqrt(1 - cosT * cosT),
@@ -67,22 +58,39 @@ export function camera()
       sinP = (this.loc.x - this.at.x) / plen,
       Azimuth = sys.R2D(Math.atan2(sinP, cosP)),
       Elevator = sys.R2D(Math.atan2(sinT, cosT));
-    Azimuth += 3 * 1.875 * (this.keys("ArrowRight") - this.keys("ArrowLeft"));
-    Elevator += 2 * 1.875 * (this.keys("ArrowDown") - this.keys("ArrowUp"));
+    Azimuth += 3 * 1.875 * (this.keys("ArrowLeft") - this.keys("ArrowRight"));
+    Elevator += 2 * 1.875 * (this.keys("ArrowUp") - this.keys("ArrowDown"));
     if (Elevator < 0.08) Elevator = 0.08;
     if (Elevator > 178.9) Elevator = 178.9;
-    Dist += (1 + this.keys("ShiftLeft") * 28) * (2 * this.mdz + 0.125 * (this.keys("PageUp") - this.keys("PageDown")));
+    //if (Azimuth < -178.9) Azimuth = -178.9;
+    //if (Azimuth > 0.08) Azimuth = 0.08;
+    sys.azimuth = Azimuth;
+    sys.elevator = Elevator;
+    Dist +=
+      (1 + this.keys("ShiftLeft") * 28) *
+      (2 * this.mdz + 0.125 * (this.keys("PageUp") - this.keys("PageDown")));
     if (Dist < 0.1) Dist = 0.1;
-    if (this.keys("rmouse")) 
-    {
-      let sx, sy;
-      let dv = sys.vec3(0);
-      sx = (((-this.mdx * this.wp) / canvas.width) * Dist) / this.projdist;
-      sy = (((this.mdy * this.hp) / canvas.height) * Dist) / this.projdist;
-      dv = sys.addVec(vec3(this.right).mul(sx), sys.vec3(this.up).mul(sy));
-      this.at = sys.addVec(this.at, dv);
-      this.loc = sys.addVec(this.loc, dv);
-    }
+    let sx, sz;
+    let dv = sys.vec3(0);
+    sx =
+      ((((-(this.keys("KeyA") - this.keys("KeyD")) * this.wp) / canvas.width) *
+        60.456) /
+        this.projdist) *
+      15.125;
+    sz =
+      (((((this.keys("KeyW") - this.keys("KeyS")) * this.hp) / canvas.height) *
+        60.456) /
+        this.projdist) *
+      15.125;
+    dv = sys.addVec(
+      sys.vec3(this.right).mul(sx),
+      sys
+        .vec3(sys.subVec(sys.vec3(this.at.x, this.loc.y, this.at.z), this.loc))
+        .normalize()
+        .mul(sz)
+    );
+    this.at = sys.addVec(this.at, dv);
+    this.loc = sys.addVec(this.loc, dv);
     this.set(
       sys.pointTransform(
         sys.vec3(0, Dist, 0),
@@ -97,8 +105,11 @@ export function camera()
     );
     this.mdz = this.mdx = this.mdy = 0.0;
   };
-  this.set = function(loc = sys.vec3(8), at = sys.vec3(0), up = sys.vec3(0, 1, 0))
-  {
+  this.set = function (
+    loc = sys.vec3(8),
+    at = sys.vec3(0),
+    up = sys.vec3(0, 1, 0)
+  ) {
     this.view = sys.matrView(loc, at, up);
 
     this.vp = sys.mulMatr(this.view, this.proj);
@@ -121,30 +132,41 @@ export function camera()
       this.view.massiv[2][0]
     );
   };
-  this.projsize = this.projdist = 0.1;
+  this.wp = this.hp = this.projsize = this.projdist = 0.1;
   this.projfarclip = 30000;
   this.mx = this.my = this.mz = this.mdz = this.wheel = this.mdx = this.mdy = 0;
   this.keyboard = [];
-  this.keyboard["lmouse"] = this.keyboard["ArrowDown"] = this.keyboard["rmouse"] = this.keyboard["PageUp"] = this.keyboard["PageDown"] = this.keyboard["ShiftLeft"] = this.keyboard["ArrowRight"] = this.keyboard["ArrowLeft"] = this.keyboard["ArrowUp"] = 0.0;
-  this.resize = function(w, h)
-  {
-    let rx = this.projsize, ry = this.projsize;
+  this.keyboard["lmouse"] =
+    this.keyboard["ArrowDown"] =
+    this.keyboard["rmouse"] =
+    this.keyboard["PageUp"] =
+    this.keyboard["PageDown"] =
+    this.keyboard["ShiftLeft"] =
+    this.keyboard["ArrowRight"] =
+    this.keyboard["ArrowLeft"] =
+    this.keyboard["ArrowUp"] =
+      0.0;
+  this.resize = function (w, h) {
+    this.wp = this.hp = this.projsize;
     if (w > h) {
-      rx *= w / h;
-    }
-    else {
-      ry *= h / w;
+      this.wp *= w / h;
+    } else {
+      this.hp *= h / w;
     }
     this.proj = sys.matrFrustum(
-      -rx / 2,
-      rx / 2,
-      -ry / 2,
-      ry / 2,
+      -this.wp / 2,
+      this.wp / 2,
+      -this.hp / 2,
+      this.hp / 2,
       this.projdist,
       this.projfarclip
     );
-    this.set();
-  }
+    let a = (sys.primcow.maxBB.z + sys.primcow.minBB.z) / 2;
+    this.set(
+      sys.vec3(sys.primcow.location, sys.primcow.maxBB.y, a),
+      sys.vec3(sys.primcow.location + 0.1, sys.primcow.maxBB.y, a)
+    );
+  };
   return this;
 }
 
