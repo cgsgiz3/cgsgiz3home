@@ -1,0 +1,27 @@
+.text-align-center {
+    text-align: center;
+}
+.text-align-right {
+    text-align: right;
+}
+.text-align-left {
+    text-align: left;
+}
+.lose-div {
+    background-color: rgb(46, 7, 39);
+    color: rgb(0, 255, 34);
+    font-size: 100cm;
+    font-style: italic;
+    width:1000px;
+    height:1000px;
+    margin: auto;
+}
+
+.floating-div {
+    position: absolute;
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 0, 0);
+    font-family: monospace;
+    font-size: 2cm;
+    text-shadow: 0px 0px 5px rgb(255, 0, 0), 0px 0px 5px rgb(82, 0, 0), 0px 0px 5px rgb(255, 0, 0), 0px 0px 5px rgb(255, 0, 0);
+}
