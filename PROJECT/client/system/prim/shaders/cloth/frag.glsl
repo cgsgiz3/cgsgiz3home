@@ -6,6 +6,7 @@ out vec4 out_color;
 in vec3 pos;
 in vec3 time;
 in vec3 loc;
+in vec3 normal;
 
 uniform materialBuffer
 {
@@ -13,7 +14,7 @@ uniform materialBuffer
   vec4 Kd1;
   vec4 KsPh;
 }; 
-vec3 shade(vec3 normal) 
+vec3 shade() 
 {            
   vec3 Ka = KaTrans.xyz / 2.2;
   vec3 Kd = Kd1.xyz / 2.2;
@@ -31,6 +32,6 @@ vec3 shade(vec3 normal)
 }
 void main()
 {
-  //out_color = vec4(shade(vec3(1.0, 1.0, 0.0)), 1);
-  out_color = vec4(1, 0, 0, 1);
+  //out_color = vec4(shade(), 1);
+  out_color = vec4(normal, 1);
 }

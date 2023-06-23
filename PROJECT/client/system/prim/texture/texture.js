@@ -172,6 +172,7 @@ export class cube_texture {
         this.countTextures--;
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.id);
         gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        //gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
         if (!this.countTextures) {
           gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
           this.value = 1;

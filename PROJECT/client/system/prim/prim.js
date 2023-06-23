@@ -393,7 +393,7 @@ export function primitiveCreateSky(file) {
   return primitive;
 }
 export function primitiveCreateCloth(w, h) {
-  let optimallength = 5,
+  let optimallength = 5.0,
     j,
     i,
     v,
@@ -402,31 +402,29 @@ export function primitiveCreateCloth(w, h) {
     lenv,
     length,
     k;
+  let weight = 0.01;
   let primitive = {};
   this.V = [];
   this.I = [];
+  this.OldV = [];
   primitive.file = "cloth";
   primitive.buffer = {};
   let width = ((w - 1.0) * optimallength) / 2.0;
   let hieght = ((h - 1.0) * optimallength) / 2.0;
   k = 4;
   this.V[0] = sys.vec3(-width, 10.0, -hieght);
-  this.V[0].weight = Math.random();
   this.I[0] = [0, w];
   this.I[1] = [0, 1];
-  for (j = 1; j < w - 3; j++) {
+  for (j = 1; j < w - 2; j++) {
     this.V[j] = sys.vec3(j * optimallength - width, 10.0, -hieght);
-    this.V[j].weight = Math.random();
     this.I[k++] = [j, w + j];
     this.I[k++] = [j, j + 1];
   }
   this.V[w - 2] = sys.vec3((w - 2) * optimallength - width, 10.0, -hieght);
-  this.V[w - 2].weight = Math.random();
   this.I[k++] = [w - 2, w + w - 2];
-  this.I[2] = [w - 2, w - 1];
+  this.I[2] = [w - 1, w - 2];
 
   this.V[w - 1] = sys.vec3((w - 1) * optimallength - width, 10.0, -hieght);
-  this.V[w - 1].weight = Math.random();
   this.I[3] = [w - 1, w + w - 1];
   for (i = 1; i < h - 1; i++) {
     for (j = 0; j < w; j++) {
@@ -435,7 +433,6 @@ export function primitiveCreateCloth(w, h) {
         10.0,
         i * optimallength - hieght
       );
-      this.V[i * w + j].weight = Math.random();
       this.I[k++] = [i * w + j, (i + 1) * w + j];
       this.I[k++] = [i * w + j, i * w + j + 1];
     }
@@ -448,7 +445,6 @@ export function primitiveCreateCloth(w, h) {
       10.0,
       i * optimallength - hieght
     );
-    this.V[i * w + j].weight = Math.random();
     this.I[k++] = [i * w + j, i * w + j + 1];
   }
   this.V[h * w - 1] = sys.vec3(
@@ -456,65 +452,57 @@ export function primitiveCreateCloth(w, h) {
     10.0,
     (h - 1) * optimallength - hieght
   );
-  this.V[h * w - 1].weight = Math.random();
+  this.OldV = [...this.V];
   primitive.apply = () => {
+    /*  вектор */
     for (j = 1; j < w - 1; j++) {
-      this.V[j].y -= this.V[j].weight;
+      let v = sys.subVec(this.V[j], this.OldV[j]);
+      this.V[j] = sys.addVec(this.V[j], sys.vec3(v).mul(0.99));
+      this.OldV[j] = this.V[j];
     }
     for (i = 1; i < h; i++) {
       for (j = 0; j < w; j++) {
-        this.V[i * w + j].y -= this.V[i * w + j].weight;
+        let v = sys.subVec(this.V[i * w + j], this.OldV[i * w + j]);
+        this.V[i * w + j] = sys.addVec(
+          this.V[i * w + j],
+          sys.vec3(v).mul(0.99)
+        );
+        this.OldV[i * w + j] = this.V[i * w + j];
       }
     }
-    for (k = 0; k < 2; k++) {
+    /*  вес */
+    for (j = 1; j < w - 1; j++) {
+      this.V[j].y -= weight;
+    }
+    for (i = 1; i < h; i++) {
+      for (j = 0; j < w; j++) {
+        this.V[i * w + j].y -= weight;
+      }
+    }
+    /*  раскидание */
+    for (k = 0; k < 4; k++) {
       v = sys.subVec(this.V[this.I[k][1]], this.V[this.I[k][0]]);
       length = v.length();
       lenv = length - optimallength;
       v.normalize();
-      if (length < optimallength) {
-        lenv = -lenv;
-      }
-      w1 = this.V[this.I[k][1]].weight;
-      this.V[this.I[k][1]] = sys.addVec(this.V[this.I[k][1]], v.mul(-lenv));
-      this.V[this.I[k][1]].weight = w1;
+      this.V[this.I[k][1]] = sys.addVec(
+        this.V[this.I[k][1]],
+        sys.vec3(v).mul(-lenv)
+      );
     }
-    k = 2;
-    v = sys.subVec(this.V[this.I[k][1]], this.V[this.I[k][0]]);
-    length = v.length();
-    lenv = length - optimallength;
-    v.normalize();
-    if (length < optimallength) {
-      lenv = -lenv;
-    }
-    w1 = this.V[this.I[k][0]].weight;
-    this.V[this.I[k][0]] = sys.addVec(this.V[this.I[k][0]], v.mul(lenv));
-    this.V[this.I[k][0]].weight = w1;
-    k = 3;
-    v = sys.subVec(this.V[this.I[k][1]], this.V[this.I[k][0]]);
-    length = v.length();
-    lenv = length - optimallength;
-    v.normalize();
-    if (length < optimallength) {
-      lenv = -lenv;
-    }
-    w1 = this.V[this.I[k][1]].weight;
-    this.V[this.I[k][1]] = sys.addVec(this.V[this.I[k][1]], v.mul(-lenv));
-    this.V[this.I[k][1]].weight = w1;
-
     for (let k = 4; k < this.I.length; k++) {
       v = sys.subVec(this.V[this.I[k][1]], this.V[this.I[k][0]]);
       length = v.length();
       lenv = (length - optimallength) / 2;
       v.normalize();
-      if (length < optimallength) {
-        lenv = -lenv;
-      }
-      w1 = this.V[this.I[k][0]].weight;
-      w2 = this.V[this.I[k][1]].weight;
-      this.V[this.I[k][0]] = sys.addVec(this.V[this.I[k][0]], v.mul(-lenv));
-      this.V[this.I[k][1]] = sys.addVec(this.V[this.I[k][1]], v.mul(lenv));
-      this.V[this.I[k][0]].weight = w1;
-      this.V[this.I[k][1]].weight = w2;
+      this.V[this.I[k][0]] = sys.addVec(
+        this.V[this.I[k][0]],
+        sys.vec3(v).mul(lenv)
+      );
+      this.V[this.I[k][1]] = sys.addVec(
+        this.V[this.I[k][1]],
+        sys.vec3(v).mul(-lenv)
+      );
     }
     //for (let i = 0; i < h - 1; i++) {
     //  for (let j = 0; j < w - 1; j++) {
@@ -523,22 +511,22 @@ export function primitiveCreateCloth(w, h) {
     //    let lenv = (length - optimallength) / 2;
     //    v.normalize();
     //    if (length < optimallength) {
-    //      sys.addVec(this.V[i * w + j], v.mul(-lenv));
-    //      sys.addVec(this.V[i * w + j + 1], v.mul(lenv));
+    //      sys.addVec(this.V[i * w + j], sys.vec3(v).mul(-lenv));
+    //      sys.addVec(this.V[i * w + j + 1], sys.vec3(v).mul(lenv));
     //    } else if (length > optimallength) {
-    //      sys.addVec(this.V[i * w + j], v.mul(lenv));
-    //      sys.addVec(this.V[i * w + j + 1], v.mul(-lenv));
+    //      sys.addVec(this.V[i * w + j], sys.vec3(v).mul(lenv));
+    //      sys.addVec(this.V[i * w + j + 1], sys.vec3(v).mul(-lenv));
     //    }
     //    v = sys.subVec(this.V[(i + 1) * w + j], this.V[i * w + j]);
     //    length = v.length();
     //    lenv = (length - optimallength) / 2;
     //    v.normalize();
     //    if (length < optimallength) {
-    //      sys.addVec(this.V[i * w + j], v.mul(-lenv));
-    //      sys.addVec(this.V[(i + 1) * w + j], v.mul(lenv));
+    //      sys.addVec(this.V[i * w + j], sys.vec3(v).mul(-lenv));
+    //      sys.addVec(this.V[(i + 1) * w + j], sys.vec3(v).mul(lenv));
     //    } else if (length > optimallength) {
-    //      sys.addVec(this.V[i * w + j], v.mul(lenv));
-    //      sys.addVec(this.V[(i + 1) * w + j], v.mul(-lenv));
+    //      sys.addVec(this.V[i * w + j], sys.vec3(v).mul(lenv));
+    //      sys.addVec(this.V[(i + 1) * w + j], sys.vec3(v).mul(-lenv));
     //    }
     //  }
     //  let j = w - 1;
@@ -547,11 +535,11 @@ export function primitiveCreateCloth(w, h) {
     //  let lenv = (length - optimallength) / 2;
     //  v.normalize();
     //  if (length < optimallength) {
-    //    sys.addVec(this.V[i * w + j], v.mul(-lenv));
-    //    sys.addVec(this.V[(i + 1) * w + j], v.mul(lenv));
+    //    sys.addVec(this.V[i * w + j], sys.vec3(v).mul(-lenv));
+    //    sys.addVec(this.V[(i + 1) * w + j], sys.vec3(v).mul(lenv));
     //  } else if (length > optimallength) {
-    //    sys.addVec(this.V[i * w + j], v.mul(lenv));
-    //    sys.addVec(this.V[(i + 1) * w + j], v.mul(-lenv));
+    //    sys.addVec(this.V[i * w + j], sys.vec3(v).mul(lenv));
+    //    sys.addVec(this.V[(i + 1) * w + j], sys.vec3(v).mul(-lenv));
     //  }
     //}
     //let i = h - 1;
@@ -561,11 +549,11 @@ export function primitiveCreateCloth(w, h) {
     //  let lenv = (length - optimallength) / 2;
     //  v.normalize();
     //  if (length < optimallength) {
-    //    sys.addVec(this.V[i * w + j], v.mul(-lenv));
-    //    sys.addVec(this.V[i * w + j + 1], v.mul(lenv));
+    //    sys.addVec(this.V[i * w + j], sys.vec3(v).mul(-lenv));
+    //    sys.addVec(this.V[i * w + j + 1], sys.vec3(v).mul(lenv));
     //  } else if (length > optimallength) {
-    //    sys.addVec(this.V[i * w + j], v.mul(lenv));
-    //    sys.addVec(this.V[i * w + j + 1], v.mul(-lenv));
+    //    sys.addVec(this.V[i * w + j], sys.vec3(v).mul(lenv));
+    //    sys.addVec(this.V[i * w + j + 1], sys.vec3(v).mul(-lenv));
     //  }
     //}
   };

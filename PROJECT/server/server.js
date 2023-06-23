@@ -19,10 +19,10 @@ const io = new Server(server);
 app.use(morgan("combined"));
 app.use(express.json());
 app.use(cookieParser());
-//app.use("/basic", userAuth, express.static("../views/chat"));
-//app.use("/", express.static("../views/beginning"));
-app.use("/", express.static("../views/chat"));
-app.use("/basic", express.static("../views/chat"));
+app.use("/basic", userAuth, express.static("../views/chat"));
+app.use("/", express.static("../views/beginning"));
+//app.use("/", express.static("../views/chat"));
+//app.use("/basic", express.static("../views/chat"));
 
 app.use("/api/auth", require("../Auth/route.js"));
 app.get("/logout", (req, res) => {
@@ -142,9 +142,7 @@ io.on("connection", async (socket) => {
       socket.handshake.headers.cookie.split("=")[1]
     );
   }
-  socket.login = socket.id;
   if (socket.login) {
-    socket.login = socket.id;
     numOfClientOnline++;
     for (let client in clientsonline) {
       client = clientsonline[client];

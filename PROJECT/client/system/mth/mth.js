@@ -20,7 +20,6 @@ class newvec3 {
   };
   length = () => {
     let len = this.dot(this);
-
     if (len == 1.0 || len == 0.0) {
       return len;
     }

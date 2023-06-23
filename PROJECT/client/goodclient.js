@@ -7,53 +7,65 @@ async function main() {
   let divContainerElement = document.getElementById("divcontainer");
   let autoCow = document.getElementById("autoCow");
   socket.on("connect", () => {
-    sys.sizeField = 500.0;
+    sys.sizeField = 10.0;
     sys.primcow = sys.objLoadSync("cow");
     sys.primtree = sys.objLoadSync("tree");
-    sys.primcloth = sys.primitiveCreateCloth(3, 3);
+    sys.primcloth = sys.primitiveCreateCloth(14, 14);
     sys.primgrid = sys.primitiveCreateGrid(20, 20, sys.sizeField);
     sys.primsky = sys.primitiveCreateSky("./skybox/IceMountains");
     sys.resize(canvas.width, canvas.height);
     autoCow.onchange = () => {
+      let t = 0.1;
+      sys.autoCow.startpos = sys.autoCow.pos;
+      let vector = sys.vec3(sys.at.x, sys.at.y - sys.primcow.maxBB.y, sys.at.z);
+      let cowstartangle = sys.subVec(vector, sys.autoCow.startpos);
       if (autoCow.checked) {
         let startTime = sys.localTime;
+        let vector = sys.vec3(
+          sys.at.x,
+          sys.at.y - sys.primcow.maxBB.y,
+          sys.at.z
+        );
         let drawAutoCow = () => {
-          let t = sys.localTime - startTime;
           startTime = sys.localTime;
-          let vector = sys.vec3(
-            sys.at.x,
-            sys.at.y - sys.primcow.maxBB.y,
-            sys.at.z
-          );
+          vector = sys.vec3(sys.at.x, sys.at.y - sys.primcow.maxBB.y, sys.at.z);
+          t += (t / 2.0) * t;
+          if (t > 1.0) {
+            t = 0.1;
+          }
           let cowRight = sys.addVec(
-            sys.vec3(sys.right).normalize() * 8.125,
+            sys
+              .vec3(sys.right.x, 0.0, sys.right.z)
+              .normalize()
+              .mul(vector.length() / 3.0),
             vector
           );
           let finalvector = sys.addVec(
             sys.addVec(
-              sys.vec3(sys.autoCow.pos).mul(1 - t * t),
-              cowRight.mul(2 * (1 - t))
+              sys.vec3(sys.autoCow.pos).mul((1 - t) * (1 - t)),
+              cowRight.mul(2 * (1 - t) * t)
             ),
             sys.vec3(vector).mul(t * t)
           );
           let angle = Math.acos(
             sys
-              .vec3(1, 0, 0)
-              .dot(sys.subVec(finalvector, sys.autoCow.pos).normalize())
+              .subVec(finalvector, sys.autoCow.startpos)
+              .normalize()
+              .dot(cowstartangle.normalize())
           );
-          sys.autoCow.pos = finalvector;
           let world = sys.mulMatr(
-            sys.matrRotateY(angle),
+            sys.matrRotateY(90.0 - angle),
             sys.vec3(finalvector).translete()
           );
-          if (sys.subVec(finalvector, vector).length() < 1) {
+          if (sys.subVec(finalvector, vector).length() < 6.0) {
             let losediv = document.createElement("div");
             losediv.className = "lose-div";
             losediv.innerText = "You lose";
             divContainerElement.appendChild(losediv);
             sys = {};
           }
-          sys.primcow.draw(world);
+          sys.autoCow.pos = finalvector;
+          sys.autoCow.draw(world);
 
           window.requestAnimationFrame(drawAutoCow);
         };
@@ -62,6 +74,7 @@ async function main() {
       }
     };
     socket.on("deleteOtherPrim", (name) => {
+      otherprims[name][1].innerText = "";
       delete otherprims[name];
       sys.primcow.instance--;
       sys.primcow.updateShader(sys.primcow.instance);
